@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | NeuroAssist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        .content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn-container {
+            display: flex;
+            gap: 20px;
+        }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            border: none;
+            outline: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            background-color: wheat;
+            color: black;
+            text-decoration: none;
+            width: 180px;
+            text-align: center;
+        }
+        .btn i {
+            margin-right: 8px;
+        }
+        .btn:hover {
+            color: white;
+            background-color: #d4a76a;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="{{ url_for('static', filename='logodesign.png') }}" alt="logo">
+        <h1>Rememberly</h1>
+    </div>
+    <br>
+    <br>
+
+    <div class="text-center mt-5">
+        <h1>📊 View Dashboard</h1>
+    </div>
+
+    <div class="content">
+        <div class="btn-container">
+          <a href="{{ url_for('history') }}" class="btn">
+            <i class="fa-solid fa-file-lines"></i>
+            History of Prompts
+          </a>
+
+           <a href="{{ url_for('charts_insights') }}" class="btn">
+            <i class="fa-solid fa-square-poll-vertical"></i>
+            Charts & Insights
+          </a>
+        </div>
+
+</body>
+</html>

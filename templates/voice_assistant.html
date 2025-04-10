@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        .mic-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh;
+        }
+        .mic-icon {
+            width: 80px;
+            height: 80px;
+            background-color: wheat;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .mic-icon:hover {
+            background-color: #d4a76a;
+        }
+        .mic-icon i {
+            font-size: 36px;
+            color: white;
+        }
+        #status {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            background-color: wheat;
+            color: black;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #d4a76a;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='logodesign.png') }}" alt="logo">
+        <h1>Rememberly</h1>
+    </div>
+    <br>
+    <br>
+
+        
+    <div class="mic-container">
+        <div class="mic-icon" id="mic">
+            <i class="fa fa-microphone"></i>
+        </div>
+        
+    </div>
+    <p id="status">Click the mic to start listening</p>
+       
+
+
+
+    <div class="button-container">
+        <button id="startBtn">Start</button>
+        <button id="stopBtn" disabled>Stop</button>
+    </div>
+
+    <script>
+        let recognition;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = "en-US";
+
+            recognition.onstart = function() {
+                document.getElementById('status').innerText = "Listening...";
+            };
+
+            recognition.onresult = function(event) {
+                let speechResult = event.results[0][0].transcript;
+                document.getElementById('status').innerText = "Processing...";
+                
+                fetch('/process_voice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: speechResult })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').innerText = "Response: " + data.response;
+                });
+            };
+
+            recognition.onerror = function() {
+                document.getElementById('status').innerText = "Error occurred!";
+            };
+
+            recognition.onend = function() {
+                document.getElementById('status').innerText = "Click the mic to start listening";
+            };
+        }
+
+        document.getElementById('mic').onclick = function() {
+            recognition.start();
+        };
+
+        document.getElementById('startBtn').onclick = function() {
+            recognition.start();
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+        };
+
+        document.getElementById('stopBtn').onclick = function() {
+            recognition.stop();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        };
+        function startSession(patientName) {
+            fetch("/start_session", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "patient_name=" + encodeURIComponent(patientName),
+            })
+            .then(response => response.json())
+            .then(data => console.log(data.message));
+        }
+        
+        
+        function enterPatientName() {
+            let patientName = prompt("Enter Patient Name (or leave blank):");
+            if (!patientName || patientName.trim() === "") {
+                patientName = "Anonymous";
+            }
+            localStorage.setItem("patient_name", patientName);  // Save in browser
+            startSession(patientName);
+        }
+
+         // 🚀 Automatically ask on page load if no name stored
+        window.onload = function () {
+            enterPatientName();
+          
+          if (!storedName) {
+            enterPatientName();  // Trigger prompt automatically
+          } else {
+            startSession(storedName);  // Start session if name already stored
+          }
+        };
+        
+        function recognizeVoice() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US"; // Set language
+            recognition.start();
+        
+            document.getElementById("status").innerText = "Listening... 🎤";
+        
+            recognition.onresult = function(event) {
+                let patientName = event.results[0][0].transcript; // Get speech text
+                document.getElementById("status").innerText = "Recognized: " + patientName;
+                startSession(patientName); // Start session
+            };
+        
+            recognition.onerror = function() {
+                document.getElementById("status").innerText = "Error recognizing speech!";
+            };
+        }
+        
+    </script>
+
+    <!-- Font Awesome for Microphone Icon -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <!-- Add this at the end before closing body tag -->
+    <script src="{{ url_for('static', filename='js/voice_assistant.js') }}"></script>
+</body>
+</html>

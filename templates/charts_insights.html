@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Charts & Insights</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.6.1/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-cloud/build/d3.layout.cloud.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f0f0f0;
+        }
+        .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        canvas, #wordCloud {
+            margin: 20px auto;
+            display: block;
+            max-width: 700px;
+        }
+        h2, h3, p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='logodesign.png') }}" alt="logo">
+        <h1>Rememberly</h1>
+    </div>
+    <br>
+    <br>
+    <h2>Enter Patient Name to View Charts</h2>
+    <form method="POST" style="text-align: center; margin-bottom: 30px;">
+       <input type="text" name="patient_name" placeholder="Enter Patient Name" required>
+       <button type="submit">Show Insights</button>
+    </form>
+
+    <h2>📊 Charts & Insights for {{ patient_name }}</h2>
+
+    <h3>Total Interactions Summary</h3>
+    <p>Total Prompts: <b>{{ stats.total }}</b></p>
+    <p>Average Prompts/Day: <b>{{ stats.avg_per_day }}</b></p>
+    <p>Most Active Day: <b>{{ stats.most_active_day }}</b></p>
+
+    <hr>
+
+    <h3>1. Prompt Frequency by Date</h3>
+    <canvas id="promptChart" height="200"></canvas>
+
+    <h3>2. Most Asked Keywords</h3>
+    <canvas id="keywordPie" height="200"></canvas>
+    <div id="wordCloud" style="height: 400px;"></div>
+
+    <script>
+        const dates = {{ dates | tojson }};
+        const counts = {{ counts | tojson }};
+        const words = {{ words | tojson }};
+
+        // Prompt Frequency by Date
+        const ctx = document.getElementById('promptChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Prompts per Day',
+                    data: counts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    tension: 0.2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stepSize: 1
+                    }
+                }
+            }
+        });
+
+        // Pie Chart for Top Keywords
+        const pieLabels = words.map(w => w.text);
+        const pieData = words.map(w => w.value);
+        const pieColors = pieLabels.map(() => `hsl(${Math.random()*360}, 70%, 60%)`);
+
+        const pieCtx = document.getElementById('keywordPie').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    data: pieData,
+                    backgroundColor: pieColors
+                }]
+            }
+        });
+
+        // Word Cloud
+        const layout = d3.layout.cloud()
+            .size([700, 400])
+            .words(words.map(d => ({ text: d.text, size: 10 + d.value * 5 })))
+            .padding(5)
+            .rotate(() => 0)
+            .fontSize(d => d.size)
+            .on("end", draw);
+        layout.start();
+
+        function draw(words) {
+            d3.select("#wordCloud").append("svg")
+                .attr("width", 700)
+                .attr("height", 400)
+                .append("g")
+                .attr("transform", "translate(350,200)")
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", d => d.size + "px")
+                .style("fill", () => `hsl(${Math.random()*360},70%,50%)`)
+                .attr("text-anchor", "middle")
+                .attr("transform", d => `translate(${d.x},${d.y})rotate(${d.rotate})`)
+                .text(d => d.text);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Set Reminder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        /* Welcome Caregiver */
+    .welcome {
+        text-align: center;
+    }
+    
+    .profile-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+    }
+    
+    /* Form Box */
+    .form-box {
+        width: 50%;
+        margin: auto;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #f5f5f5;
+        text-align: center;
+    }
+    
+    input {
+        width: 80%;
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    button {
+        padding: 10px 15px;
+        background-color: wheat;
+        border: none;
+        border-radius: 5px;
+    }
+
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='logodesign.png') }}" alt="logo">
+        <h1>Rememberly</h1>
+    </div>
+    <br>
+    <br>
+    
+    
+    <div class="welcome">
+        <h2>Welcome, {{ caregiver_name }}</h2><br><br>
+        <img src="{{ url_for('static', filename='user.jpg') }}" class="profile-circle" alt="Caregiver Icon">
+    </div>
+    <br>
+    <br>
+
+    <div class="form-box">
+        <form method="POST">
+            <label>Patient Name:</label>
+            <input type="text" name="patient_name" required><br>
+
+            <label>Reminder:</label>
+            <input type="text" name="reminder_text" required><br>
+
+            <label>Date & Time:</label>
+            <input type="datetime-local" name="reminder_time" required><br>
+
+            <label>Repeat:</label><br><br>
+            <select name="repeat">
+               <option value="none">None</option>
+               <option value="daily">Daily</option>
+               <option value="weekly">Weekly</option>
+            </select><br><br>
+
+            <label>Notify Via:</label><br><br>
+            <select name="notify_type">
+                <option value="voice">Voice</option>
+                <option value="popup">Pop-up</option>
+                <option value="both">Both</option>
+            </select><br><br>
+
+            <button type="submit">Set Reminder</button>
+        </form>
+    </div>
+    {% if success_message %}
+    <p style="color: green; font-weight: bold;">{{ success_message }}</p>
+    {% endif %}
+</body>
+</html>

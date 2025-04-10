@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Face Recognition System</h1>
+        <video id="video" autoplay></video>
+        <button id="startRecognition">Start Recognition</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        document.getElementById("startRecognition").addEventListener("click", function() {
+            fetch("/recognize_face")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").innerText = data.message;
+                });
+        });
+    </script>
+</body>
+</html>

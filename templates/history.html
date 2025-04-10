@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prompt History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f1f1;
+            margin: 0;
+            padding: 0;
+          }
+          .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        h2{
+            margin-left: 10px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-left: 10px;
+        }
+        .patient{
+            margin-left: 10px;
+        }
+        .line {
+            border-bottom: 1px solid #ccc;
+            margin-left: 10px;
+            margin-left: 10px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 8px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        .block {
+            margin-left: 10px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='logodesign.png') }}" alt="logo">
+        <h1>Rememberly</h1>
+    </div>
+    <br>
+    <br>
+
+    
+
+    <h2>Search Patient Prompt History</h2>
+    <form method="POST" class="patient">
+        <input type="text" name="patient_name" placeholder="Enter patient name" required>
+        <button type="submit">Submit</button>
+    </form><br><br>
+
+    {% if patient %}
+        <div class="block">
+            <div class="section-title">Patient Details</div>
+            <div class="line"></div>
+            <p>Name     : {{ patient.patient_name }}</p>
+            <p>Age      : {{ patient.age }}</p>
+            <p>Caregiver: {{ patient.caregiver_name }}</p>
+    
+        </div>
+
+        <div class="block">
+            <div class="section-title">Asked Prompts & Responses</div>
+            <div class="line"></div>
+            {% if history %}
+                {% for h in history %}
+                    <p> 👦 : {{ h.prompt }}</p>
+                    <p> 🤖 : {{ h.response }}</p>
+                    <br>
+                {% endfor %}
+            {% else %}
+                <p>No prompts asked yet.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</body>
+</html>

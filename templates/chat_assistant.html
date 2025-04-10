@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NeuroAssist - Chat Assistant</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+    }
+    .header img { 
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+    .header h1 {
+        margin-left: 10px;
+        font-size: 20px;
+    }
+    .chat-history-btn {
+        position: fixed;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        background-color: wheat;
+        color: black;
+        padding: 10px 15px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+      .chat-history-btn:hover {
+            color: white;
+            background-color: #d4a76a;
+      }
+      
+    
+    .chat-container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      height: 80vh;
+      overflow-y: scroll;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .message {
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 20px;
+      max-width: 70%;
+      display: inline-block;
+      clear: both;
+    }
+    .user {
+      background-color: #dcf8c6;
+      float: right;
+      text-align: right;
+    }
+    .assistant {
+      background-color: #f1f0f0;
+      float: left;
+      text-align: left;
+    }
+    #input-container {
+      display: flex;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 10px;
+      background: #fff;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+    #promptInput {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #sendBtn {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border: none;
+      background: #4CAF50;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+    <img src="{{ url_for('static', filename='logodesign.png') }}" alt="logo">
+    <h1>Rememberly</h1>
+</div>
+<br>
+<br>
+
+<a href="/chat_history" class="chat-history-btn"><i class="fa-solid fa-clock-rotate-left"></i> Chat History</a>
+
+<div class="chat-container" id="chatBox">
+  <!-- Chat messages will be added here -->
+</div>
+
+<div id="input-container">
+  <input type="text" id="promptInput" placeholder="Type your message..." />
+  <button id="sendBtn">Send</button>
+</div>
+
+<script>
+    let patientName = prompt("Enter your name (or leave blank):");
+  if (!patientName || patientName.trim() === "") {
+    patientName = "Anonymous";
+  }
+
+   document.getElementById("sendBtn").addEventListener("click", async () => {
+    const prompt = document.getElementById("promptInput").value.trim();
+    if (!prompt) return;
+
+    addMessageToChat(prompt, "user");
+    document.getElementById("promptInput").value = "";
+
+    const response = await fetch("/chat_assistant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, patient_name: patientName })
+    });
+
+    const data = await response.json();
+
+    if (data.music_redirect) {
+      window.location.href = "https://open.spotify.com";
+    } else {
+      addMessageToChat(data.response, "assistant");
+    }
+  });
+
+  function addMessageToChat(message, sender) {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message", sender);
+    messageDiv.innerText = message;
+    document.getElementById("chatBox").appendChild(messageDiv);
+    document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+  }
+</script>
+
+</body>
+</html>
