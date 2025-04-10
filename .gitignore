@@ -1,0 +1,42 @@
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# 🔒 Environment Files
+.env
+*.env
+
+# 🧪 Virtual Environments
+venv/
+ENV/
+env/
+
+# 📝 Logs and temp files
+*.log
+*.sqlite3
+*.db
+.DS_Store
+
+# 📦 Vercel build output (just in case)
+.vercel/
+
+# 🧪 Testing
+coverage/
+*.cover
+htmlcov/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.coveragerc
+
+# 🔧 IDEs
+.vscode/
+.idea/
+
+# 🚀 OS
+Thumbs.db
+ehthumbs.db
+desktop.ini

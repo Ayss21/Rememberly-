@@ -30,7 +30,9 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['UPLOAD_FOLDER_IMAGES'] = 'static/images'
 
 # MongoDB Connection
-client = pymongo.MongoClient("mongodb://localhost:27017/")
+client = pymongo.MongoClient("mongodb+srv://aysaysha786:IlE1HZ1fhV1DDEgj@cluster0.z05ptfl.mongodb.net/")
+# client = pymongo.MongoClient("mongodb://localhost:27017/")
+
 db = client["Neuroassist-Companion"]
 collection_patients = db["patients"]
 collection_prompts = db["prompts"]
